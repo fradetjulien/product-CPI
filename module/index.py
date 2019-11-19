@@ -1,10 +1,45 @@
+import json
 import click
 import requests
-import json
 from matplotlib import pyplot as plt
 
 def build_graph(data):
-    return data
+    '''
+    Build the final graph
+    '''
+    plt.plot(data["periods"], data["values"])
+    plt.legend(data["series_id"])
+    plt.ylabel('CPI')
+    plt.xlabel('Period')
+    plt.title('Product CPI over time')
+    plt.show()
+
+def init_dictionnary():
+    '''
+    Initialize a new dictionnary and set empty lists inside
+    '''
+    new_dictionnary = {
+        "series_id": [],
+        "periods": [],
+        "values": []
+    }
+    return new_dictionnary
+
+def store_data(data):
+    '''
+    Store and sort the data retrieved from the API request
+    '''
+    sort_data = init_dictionnary()
+    try:
+        for series in data:
+            sort_data["series_id"].append(series['seriesID'])
+            for item in series['data']:
+                sort_data["periods"].append(item['year'] + ' ' + item['periodName'])
+                sort_data["values"].append(float(item['value']))
+    except:
+        print("Sorry, failure during computing API request result.")
+        return None
+    return sort_data
 
 def check_status(data, product_id, status):
     '''
@@ -30,8 +65,8 @@ def request_data(product_id, start_year, end_year):
     '''
     ranges = {'startyear': start_year, 'endyear': end_year}
     try:
-        request = requests.get('http://api.bls.gov/publicAPI/v2/timeseries/data/' + product_id 
-                            + '.json', params=ranges)
+        request = requests.get('http://api.bls.gov/publicAPI/v2/timeseries/data/' + product_id
+                               + '.json', params=ranges)
         data = json.loads(request.text)
         if not check_status(data, product_id, request.status_code):
             return None
@@ -47,6 +82,9 @@ def is_range_correct(start_year, end_year):
     if start_year > end_year:
         print("You can't specify an end year that previous the start year.")
         return False
+    if start_year < 1995:
+        print("Sorry, we can't retrieve data previous 1995.")
+        return False
     return True
 
 @click.group()
@@ -59,14 +97,16 @@ def cli():
 @click.argument('product_id')
 @click.option('--startyear', '-s', default=2009, type=int)
 @click.option('--endyear', '-e', default=2019, type=int)
-def build_CPI(product_id, startyear, endyear):
+def build_cpi(product_id, startyear, endyear):
     '''
     Manage all steps in order to build the final graph
     '''
     if is_range_correct(startyear, endyear):
         data = request_data(product_id, startyear, endyear)
-        if data:
-            build_graph(data['Results'])
+    if data:
+        data = store_data(data['Results']['series'])
+    if data:
+        build_graph(data)
 
 if __name__ == '__main__':
     cli()
