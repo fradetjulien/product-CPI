@@ -11,6 +11,7 @@ pylint = "*"
 pyinstaller = "*"
 requests = "*"
 ipython = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.7"
