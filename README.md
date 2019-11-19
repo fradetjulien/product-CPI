@@ -1,6 +1,6 @@
 # CPI
 
-By getting a product ID, build a graphic which showing the inflation rate from a start year to an end year.
+By getting a product ID, build a graphic which shows the inflation rate from a start year to an end year.
 
 ## Installation
 
