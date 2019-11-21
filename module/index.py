@@ -11,6 +11,7 @@ def build_graph(data):
     plt.legend(data["series_id"])
     plt.ylabel('CPI')
     plt.xlabel('Period')
+    plt.xticks(rotation=90)
     plt.title('Product CPI over time')
     plt.show()
 
@@ -36,6 +37,8 @@ def store_data(data):
             for item in series['data']:
                 sort_data["periods"].append(item['year'] + ' ' + item['periodName'])
                 sort_data["values"].append(float(item['value']))
+        sort_data["periods"].reverse()
+        sort_data["values"].reverse()
     except:
         print("Sorry, failure during computing API request result.")
         return None
