@@ -1,3 +1,6 @@
+'''
+Product CPI over time
+'''
 import json
 import click
 import requests
@@ -12,6 +15,7 @@ def build_graph(data):
     plt.ylabel('CPI')
     plt.xlabel('Period')
     plt.xticks(rotation=90)
+    plt.grid(True)
     plt.title('Product CPI over time')
     plt.show()
 
